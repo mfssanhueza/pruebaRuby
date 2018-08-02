@@ -1,10 +1,11 @@
 option = -1
 while option != 4
-  puts 'Bienvenido al menú, ingrese el número de su opción:'
+  puts 'Bienvenido al menú:'
   puts 'Para generar archivo con promedio de notas, escriba 1'
   puts 'Para ver total de inasistencias, escriba 2'
   puts 'Para ver listado de alumnos aprobados, escriba 3'
   puts 'Para salir, escriba 4'
+  puts 'Ingrese su opción:'
 
   file = File.open('pruebaRuby.txt', 'r')
   lines = file.readlines
@@ -13,29 +14,34 @@ while option != 4
     array.push(ele.gsub('\n', '').gsub(',','').split(' '))
   end
   names = (array.map { |ele| ele[0] })
-  grades = array.each(&:shift)
-  grades = grades.map {|ele| ele.reject{|x| x == 'A'}}
-  numeric_grades = grades.map{|ele| ele.map(&:to_i)}
-  print numeric_grades
-  names_grades = Hash[names.zip(numeric_grades)]
-  print names_grades
+  raw_data = array.each(&:shift)
+  absence = raw_data.map { |ele| ele.select { |x| x == 'A' } }
+  grades = raw_data.map { |ele| ele.reject { |x| x == 'A' } }
+  numeric_grades = grades.map { |ele| ele.map(&:to_i) }
+  ordered_data = Hash[names.zip(numeric_grades)]
   file.close
-
-  option = gets.chomp.to_i
+  option =  gets.chomp.to_i
 
   if option == 1
-    suma = numeric_grades.flatten.length
-    print suma
-    names_grades.keys.each {|key| puts "#{key}: 6,3"}
-
-
-    # file = File.new('promedios.txt', 'w')
-    # names.each {|name| puts "el promedio de #{name} es "}
-    # file.close
+    file = File.new('promedios.txt', 'w')
+    ordered_data.each do |key, data|
+      suma = data.inject(0) { |sum, x| sum + x }
+      average = suma.to_f / data.length
+      file.puts "#{key}: #{average}"
+    end
+    file.close
+    puts 'El archivo con nombres y promedios de alumnos se generó exitosamente'
 
   elsif option == 2
-    puts 'Hola'
+    puts "En total, ha habido #{absence.flatten.count} inasistencias a pruebas"
+  elsif option == 3
+    ordered_data.each do |key, data|
+      suma = data.inject(0) { |sum, x| sum + x }
+      average = suma.to_f / data.length
+      puts "#{key} aprobó con #{average}." if average >= 5
+    end
+  elsif option == 4
   else
-    puts 'Chao'
+    puts 'Opción inválida, por favor intente nuevamente'
   end
 end
