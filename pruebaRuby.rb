@@ -1,4 +1,11 @@
 option = -1
+def aprobados (hash, nota)
+  hash.each do |key, data|
+    suma = data.inject(0) { |sum, x| sum + x }
+    average = suma.to_f / data.length
+    puts "#{key} aprobó con #{average}." if average >= nota
+  end
+end
 while option != 4
   puts 'Bienvenido al menú:'
   puts 'Para generar archivo con promedio de notas, escriba 1'
@@ -35,11 +42,7 @@ while option != 4
   elsif option == 2
     puts "En total, ha habido #{absence.flatten.count} inasistencias a pruebas"
   elsif option == 3
-    ordered_data.each do |key, data|
-      suma = data.inject(0) { |sum, x| sum + x }
-      average = suma.to_f / data.length
-      puts "#{key} aprobó con #{average}." if average >= 5
-    end
+    aprobados(ordered_data, 5)
   elsif option == 4
   else
     puts 'Opción inválida, por favor intente nuevamente'
